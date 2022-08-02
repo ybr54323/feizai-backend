@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:1234@localhost:3306/feizai"
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String
+  content   String?
+  viewCount Int      @default(0)
+  files     File[]
+}
+
+model File {
+  id       Int      @id @default(autoincrement())
+  name     String
+  createAt DateTime @default(now())
+  Post     Post?    @relation(fields: [postId], references: [id])
+  postId   Int?
+}
