@@ -17,6 +17,6 @@ export default {
       throw new Error({ ...error });
     }
 
-    throw new Error("have no info");
+    throw new Error("boot project should width -u and -p");
   },
 };

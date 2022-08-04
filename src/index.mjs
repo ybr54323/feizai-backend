@@ -3,9 +3,34 @@ import userRoute from "./routes/user.mjs";
 import postRouter from "./routes/post.mjs";
 import cookieSession from "cookie-session";
 import { auth } from "./middleware/auth.mjs";
+import utils from "./utils/index.mjs";
 
+try {
+  utils.genUserAndPwd();
+} catch (error) {
+  throw error;
+}
 const app = express();
 
+app.all("*", function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type,Content-Length, Authorization,Origin,Accept,X-Requested-With"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header("X-Powered-By", " 3.2.1");
+  res.header("Content-Type", "application/json;charset=utf-8");
+  if (req.method === "OPTIONS") {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
 app.use(express.json());
 app.use(
   cookieSession({
@@ -17,7 +42,12 @@ app.use(
 app.use(auth);
 app.use(userRoute);
 app.use(postRouter);
-app.use(express.static("public"));
+app.use("/public", express.static("public"));
+const server = app.listen(3000, () =>
+  console.log(`
+🚀 Server ready at: http://localhost:3000
+⭐️ See sample requests: http://pris.ly/e/ts/rest-express#3-using-the-rest-api`)
+);
 
 // app.post(`/post`, async (req, res) => {
 //   const { title, content, authorEmail } = req.body;
@@ -138,9 +168,3 @@ app.use(express.static("public"));
 
 //   res.json(posts);
 // });
-
-const server = app.listen(3000, () =>
-  console.log(`
-🚀 Server ready at: http://localhost:3000
-⭐️ See sample requests: http://pris.ly/e/ts/rest-express#3-using-the-rest-api`)
-);
