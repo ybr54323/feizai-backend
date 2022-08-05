@@ -5,9 +5,7 @@ import multer from "multer";
 import path from "path";
 const { PrismaClient } = Prisma;
 const postRouter = Router();
-const prisma = new PrismaClient({
-  
-});
+const prisma = new PrismaClient({});
 const storage = multer.diskStorage({
   destination(req, file, cb) {
     cb(null, "public/");
@@ -68,7 +66,6 @@ postRouter.get("/posts", async (req, res) => {
 });
 postRouter.delete("/post", async (req, res) => {
   const id = Number(req.query.id);
-
   try {
     await prisma.post.delete({
       where: {
@@ -86,8 +83,53 @@ postRouter.get("/post", async (req, res) => {
       where: {
         id,
       },
+      include: {
+        files: true,
+      },
     });
     res.json({ row: result });
+  } catch (error) {
+    res.status(400).json({ msg: error.stack });
+  }
+});
+postRouter.put("/post", upload.array("files", 9), async (req, res) => {
+  const { id, title, content, originalFilenames } = req.body;
+  const files = req.files;
+  try {
+    const originalPost = await prisma.post.findUnique({
+      where: { id: Number(id) },
+      include: { files: true },
+    });
+    const originalFiles = originalPost.files;
+
+    const delFileIds = originalFiles
+      .filter((oFile) => !originalFilenames.includes(oFile.name))
+      .map((oFile) => {
+        return {
+          id: oFile.id,
+        };
+      });
+
+    const createFiles = files.map((nFile) => {
+      return {
+        name: nFile.filename,
+      };
+    });
+
+    await prisma.post.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        title,
+        content,
+        files: {
+          disconnect: delFileIds,
+          create: createFiles,
+        },
+      },
+    });
+    res.json({ success: true });
   } catch (error) {
     res.status(400).json({ msg: error.stack });
   }
