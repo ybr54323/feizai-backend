@@ -61,7 +61,7 @@ postRouter.get("/posts", async (req, res) => {
     });
     res.json({ rows: result, total: await prisma.post.count() });
   } catch (err) {
-    res.status(400).json({ msg: error.stack });
+    res.status(400).json({ msg: err.stack });
   }
 });
 postRouter.delete("/post", async (req, res) => {

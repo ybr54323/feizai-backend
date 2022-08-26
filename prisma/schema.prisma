@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:1234@localhost:3306/feizai"
+  url      = "mysql://root:2a2fecf09ddf0241@localhost:3306/feizai"
 }
 
 model Post {
@@ -15,6 +15,7 @@ model Post {
   content   String?
   viewCount Int      @default(0)
   files     File[]
+  likeCount Int      @default(0)
 }
 
 model File {

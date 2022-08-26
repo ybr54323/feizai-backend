@@ -43,7 +43,7 @@ app.use(auth);
 app.use(userRoute);
 app.use(postRouter);
 app.use("/public", express.static("public"));
-const server = app.listen(3000, () =>
+const server = app.listen(3000, '0.0.0.0', () =>
   console.log(`
 🚀 Server ready at: http://localhost:3000
 ⭐️ See sample requests: http://pris.ly/e/ts/rest-express#3-using-the-rest-api`)
